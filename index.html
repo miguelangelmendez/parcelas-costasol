@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Parcelas CostaSol</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/estilos.css"/>
+</head>
+<body>
+
+  <!-- ===================== BARRA SUPERIOR (NAVBAR) ===================== -->
+  <nav class="navbar">
+    <div class="navbar-logo">🌄 Parcelas CostaSol</div>
+    <div class="navbar-links">
+      <a href="index.html">Inicio</a>
+      <a href="#terrenos">Terrenos</a>
+      <a href="#contacto">Contacto</a>
+      <!-- Este botón cambia dependiendo de si hay admin logueado o no -->
+      <span id="botonSesion"></span>
+    </div>
+  </nav>
+
+  <script>
+    // Revisamos si hay un admin logueado en la memoria del navegador
+    const estaLogueado = localStorage.getItem("adminLogueado") === "si";
+    const boton = document.getElementById("botonSesion");
+
+    if (estaLogueado) {
+      // Si está logueado: mostramos su correo y botones de Panel y Cerrar sesión
+      const correo = localStorage.getItem("adminCorreo") || "";
+      boton.innerHTML = `
+        <span style="font-size:0.82rem; color:#D4B896; margin-right:4px;">${correo}</span>
+        <a href="admin.html" class="btn-login" style="background-color:#C68642; margin-right:6px;">Panel Admin</a>
+        <a href="#" class="btn-login" style="background-color:#7B3F00;" onclick="cerrarSesion()">Salir</a>
+      `;
+    } else {
+      // Si NO está logueado: mostramos el botón normal de Ingresar
+      boton.innerHTML = `<a href="login.html" class="btn-login">Ingresar</a>`;
+    }
+
+    function cerrarSesion() {
+      localStorage.removeItem("adminLogueado");
+      localStorage.removeItem("adminCorreo");
+      window.location.reload(); // Recarga la página para actualizar el botón
+    }
+  </script>
+
+  <!-- ===================== PORTADA (HERO) ===================== -->
+  <!-- El "hero" es la sección grande de bienvenida que lo primero que ve el visitante -->
+  <section class="hero">
+    <div class="hero-contenido">
+      <h1>Tu parcela ideal<br/>bajo el sol de Chile</h1>
+      <p>Encuentra el terreno perfecto para construir tu sueño.<br/>Parcelas con vista, naturaleza y tranquilidad.</p>
+      <a href="#terrenos" class="btn-principal">Ver terrenos disponibles</a>
+    </div>
+  </section>
+
+  <!-- ===================== SECCIÓN DE TERRENOS ===================== -->
+  <!-- Aquí se muestran las tarjetas (cards) con cada terreno -->
+  <section class="seccion-terrenos" id="terrenos">
+    <h2>Terrenos Disponibles</h2>
+    <p class="subtitulo">Selecciona el que más te guste y contáctanos</p>
+
+    <!-- Los terrenos se cargan aquí automáticamente desde lo que guardó el admin -->
+    <div class="grilla-terrenos" id="grillaTerrenos"></div>
+  </section>
+
+  <script>
+    // =====================================================
+    // MOSTRAR LOS TERRENOS EN LA PÁGINA PRINCIPAL
+    // Leemos los terrenos que guardó el admin y los
+    // mostramos como tarjetas para los visitantes.
+    // =====================================================
+    const terrenos = JSON.parse(localStorage.getItem("terrenos") || "[]");
+    const grilla = document.getElementById("grillaTerrenos");
+
+    if (terrenos.length === 0) {
+      grilla.innerHTML = `
+        <div style="grid-column:1/-1; text-align:center; padding:3rem; color:#7B3F00; font-size:1rem;">
+          🏞️ Pronto publicaremos nuevos terrenos disponibles. ¡Vuelve a visitarnos!
+        </div>`;
+    } else {
+      grilla.innerHTML = terrenos.map(function(t) {
+        const imagenHTML = t.imagen
+          ? `<img src="${t.imagen}" alt="${t.nombre}"/>`
+          : `<div style="width:100%;height:200px;background:#F5ECD7;display:flex;align-items:center;justify-content:center;font-size:3rem;">🏞️</div>`;
+
+        const badge = t.estado === "disponible"
+          ? `<div class="badge-disponible">Disponible</div>`
+          : `<div class="badge-vendido">Vendido</div>`;
+
+        const boton = t.estado === "disponible"
+          ? `<a href="https://wa.me/56988803560" class="btn-contactar" target="_blank">Consultar por WhatsApp</a>`
+          : `<a href="#" class="btn-contactar btn-deshabilitado">No disponible</a>`;
+
+        return `
+          <div class="card-terreno">
+            <div class="card-imagen">
+              ${badge}
+              ${imagenHTML}
+            </div>
+            <div class="card-info">
+              <h3>${t.nombre}</h3>
+              <p class="card-descripcion">${t.descripcion}</p>
+              <div class="card-detalles">
+                <span>📐 ${t.superficie || "—"}</span>
+                <span>📍 ${t.ubicacion || "—"}</span>
+              </div>
+              <div class="card-precio">$${t.precio} CLP</div>
+              ${boton}
+            </div>
+          </div>`;
+      }).join("");
+    }
+  </script>
+
+  <!-- ===================== FOOTER (PIE DE PÁGINA) ===================== -->
+  <!-- El footer es la parte de abajo con información de contacto y redes sociales -->
+  <footer class="footer" id="contacto">
+    <div class="footer-contenido">
+      <div class="footer-marca">
+        <h3>🌄 Parcelas CostaSol</h3>
+        <p>Vendemos terrenos con historia,<br/>naturaleza y futuro.</p>
+      </div>
+
+      <div class="footer-redes">
+        <h4>Encuéntranos en</h4>
+        <a href="https://wa.me/56988803560" class="red-social whatsapp" target="_blank">
+          <!-- SVG de WhatsApp -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.116 1.527 5.845L.057 23.852a.5.5 0 0 0 .613.613l6.007-1.47A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.9a9.886 9.886 0 0 1-5.034-1.373l-.36-.214-3.742.916.938-3.74-.234-.376A9.86 9.86 0 0 1 2.1 12C2.1 6.533 6.533 2.1 12 2.1S21.9 6.533 21.9 12 17.467 21.9 12 21.9z"/></svg>
+          WhatsApp
+        </a>
+        <a href="https://instagram.com/parcelas_costasol" class="red-social instagram" target="_blank">
+          <!-- SVG de Instagram -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          Instagram
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-inferior">
+      <p>© 2025 Parcelas CostaSol · Chile · Todos los derechos reservados</p>
+    </div>
+  </footer>
+
+</body>
+</html>

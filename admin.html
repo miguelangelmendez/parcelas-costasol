@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Panel Admin — Parcelas CostaSol</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/estilos.css"/>
+  <style>
+    body {
+      background-color: #F5ECD7;
+      min-height: 100vh;
+    }
+
+    /* ── Barra superior del panel admin ── */
+    .admin-header {
+      background-color: #3E1F00;
+      color: #FDF6EC;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .admin-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+    }
+
+    .admin-header span {
+      font-size: 0.88rem;
+      color: #D4B896;
+    }
+
+    .btn-cerrar-sesion {
+      background-color: #E07B39;
+      color: white;
+      border: none;
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn-cerrar-sesion:hover {
+      background-color: #C68642;
+    }
+
+    /* ── Contenido principal ── */
+    .admin-contenido {
+      max-width: 900px;
+      margin: 2.5rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .admin-contenido h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: #3E1F00;
+      margin-bottom: 0.3rem;
+    }
+
+    .admin-contenido .descripcion {
+      color: #7B3F00;
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    /* ── Formulario para agregar terreno ── */
+    /* Un formulario es el conjunto de campos donde escribes información */
+    .formulario-terreno {
+      background-color: #fff;
+      border-radius: 14px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(62,31,0,0.1);
+      margin-bottom: 3rem;
+    }
+
+    .formulario-terreno h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: #3E1F00;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.7rem;
+      border-bottom: 2px solid #F5ECD7;
+    }
+
+    .fila-campos {
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+      gap: 1rem;
+    }
+
+    .campo {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .campo.completo {
+      grid-column: 1 / -1; /* Ocupa las dos columnas */
+    }
+
+    .campo label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #5C3D1E;
+    }
+
+    .campo input,
+    .campo textarea,
+    .campo select {
+      padding: 0.7rem 1rem;
+      border: 1.5px solid #D4B896;
+      border-radius: 8px;
+      font-size: 0.93rem;
+      font-family: 'Lato', sans-serif;
+      color: #2C1A00;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .campo input:focus,
+    .campo textarea:focus,
+    .campo select:focus {
+      border-color: #E07B39;
+    }
+
+    .campo textarea {
+      resize: vertical; /* Solo se puede agrandar hacia abajo */
+      min-height: 90px;
+    }
+
+    /* Área para subir la imagen */
+    .zona-imagen {
+      border: 2px dashed #D4B896; /* Borde punteado */
+      border-radius: 10px;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background-color 0.2s;
+      background-color: #FDF6EC;
+      position: relative;
+    }
+
+    .zona-imagen:hover {
+      border-color: #E07B39;
+      background-color: #FFF3E6;
+    }
+
+    .zona-imagen input[type="file"] {
+      position: absolute;
+      inset: 0; /* Cubre toda la zona invisible para que al hacer clic en cualquier parte abra el explorador */
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .zona-imagen .icono {
+      font-size: 2rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .zona-imagen p {
+      font-size: 0.88rem;
+      color: #7B3F00;
+    }
+
+    /* Vista previa de la imagen antes de guardar */
+    /* Vista previa = una miniatura que muestra cómo quedará la imagen */
+    #previsualizacion {
+      display: none;
+      margin-top: 1rem;
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .btn-agregar {
+      background-color: #3E1F00;
+      color: #FDF6EC;
+      border: none;
+      padding: 0.85rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: 'Lato', sans-serif;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin-top: 0.5rem;
+    }
+
+    .btn-agregar:hover {
+      background-color: #E07B39;
+    }
+
+    /* Mensaje de éxito al guardar */
+    .mensaje-exito {
+      display: none;
+      background-color: #e8f8f0;
+      color: #1a7a45;
+      border: 1px solid #a8e0c0;
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    /* ── Lista de terrenos ya agregados ── */
+    .seccion-lista h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: #3E1F00;
+      margin-bottom: 1.2rem;
+    }
+
+    .lista-terrenos {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    /* Cada terreno en la lista del admin */
+    .item-terreno {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1rem 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      box-shadow: 0 2px 10px rgba(62,31,0,0.08);
+    }
+
+    .item-terreno img {
+      width: 90px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 8px;
+      flex-shrink: 0; /* La imagen no se achica aunque no haya espacio */
+    }
+
+    .item-info {
+      flex: 1;
+    }
+
+    .item-info h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      color: #3E1F00;
+      margin-bottom: 0.2rem;
+    }
+
+    .item-info p {
+      font-size: 0.83rem;
+      color: #7B3F00;
+    }
+
+    .item-estado {
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .estado-disponible { background: #d4f5e2; color: #1a7a45; }
+    .estado-vendido { background: #fde8e8; color: #c0392b; }
+
+    .btn-eliminar {
+      background-color: #fde8e8;
+      color: #c0392b;
+      border: none;
+      padding: 0.45rem 0.9rem;
+      border-radius: 8px;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      flex-shrink: 0;
+    }
+
+    .btn-eliminar:hover {
+      background-color: #f5c6c6;
+    }
+
+    .lista-vacia {
+      text-align: center;
+      color: #C68642;
+      padding: 2rem;
+      font-size: 0.95rem;
+      background: #fff;
+      border-radius: 12px;
+    }
+
+    .btn-editar {
+      background-color: #e8f0fe;
+      color: #1a56b0;
+      border: none;
+      padding: 0.45rem 0.9rem;
+      border-radius: 8px;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      flex-shrink: 0;
+    }
+
+    .btn-editar:hover {
+      background-color: #c3d8fc;
+    }
+
+    /* Modal = ventanita que aparece encima de la página */
+    .modal-fondo {
+      display: none; /* Empieza oculto */
+      position: fixed; /* Se queda fijo aunque hagas scroll */
+      inset: 0;
+      background: rgba(0,0,0,0.5); /* Fondo oscuro semitransparente detrás */
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .modal-fondo.activo {
+      display: flex; /* Se muestra cuando tiene la clase "activo" */
+    }
+
+    .modal-caja {
+      background: #fff;
+      border-radius: 14px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto; /* Si el contenido es largo, aparece scroll solo adentro */
+      box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+    }
+
+    .modal-caja h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: #3E1F00;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.7rem;
+      border-bottom: 2px solid #F5ECD7;
+    }
+
+    .modal-botones {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    .btn-guardar-edicion {
+      background-color: #3E1F00;
+      color: #FDF6EC;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: 'Lato', sans-serif;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn-guardar-edicion:hover { background-color: #E07B39; }
+
+    .btn-cancelar {
+      background-color: #F5ECD7;
+      color: #5C3D1E;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: 'Lato', sans-serif;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn-cancelar:hover { background-color: #D4B896; }
+
+    @media (max-width: 600px) {
+      .fila-campos { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra superior del panel -->
+  <div class="admin-header">
+    <h1>🌄 Panel de Administrador</h1>
+    <div style="display:flex; align-items:center; gap:0.8rem; flex-wrap:wrap;">
+      <span id="correoAdmin"></span>
+      <a href="index.html" style="background-color:#C68642; color:white; text-decoration:none; padding:0.45rem 1rem; border-radius:8px; font-weight:700; font-size:0.88rem;">🏠 Ver página</a>
+      <button class="btn-cerrar-sesion" onclick="cerrarSesion()">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <div class="admin-contenido">
+    <h2>Gestión de Terrenos</h2>
+    <p class="descripcion">Desde aquí puedes agregar, editar y eliminar los terrenos que aparecen en la página principal.</p>
+
+    <!-- ══════════ FORMULARIO PARA AGREGAR TERRENO ══════════ -->
+    <div class="formulario-terreno">
+      <h3>➕ Agregar nuevo terreno</h3>
+
+      <div class="fila-campos">
+        <div class="campo">
+          <label for="nombreTerreno">Nombre del terreno</label>
+          <input type="text" id="nombreTerreno" placeholder="Ej: Parcela El Roble"/>
+        </div>
+        <div class="campo">
+          <label for="precioTerreno">Precio (en pesos chilenos)</label>
+          <input type="text" id="precioTerreno" placeholder="Ej: 45.000.000"/>
+        </div>
+      </div>
+
+      <div class="fila-campos">
+        <div class="campo">
+          <label for="superficieTerreno">Superficie</label>
+          <input type="text" id="superficieTerreno" placeholder="Ej: 5.000 m²"/>
+        </div>
+        <div class="campo">
+          <label for="ubicacionTerreno">Ubicación (región o comuna)</label>
+          <input type="text" id="ubicacionTerreno" placeholder="Ej: Región del Maule"/>
+        </div>
+      </div>
+
+      <div class="campo completo">
+        <label for="descripcionTerreno">Descripción</label>
+        <textarea id="descripcionTerreno" placeholder="Describe el terreno: accesos, servicios disponibles, características especiales..."></textarea>
+      </div>
+
+      <div class="campo completo">
+        <label>Estado</label>
+        <select id="estadoTerreno">
+          <option value="disponible">Disponible</option>
+          <option value="vendido">Vendido</option>
+        </select>
+      </div>
+
+      <div class="campo completo">
+        <label>Foto del terreno</label>
+        <div class="zona-imagen" id="zonaImagen">
+          <!-- input type="file" = botón para elegir un archivo desde tu computador -->
+          <input type="file" id="inputImagen" accept="image/*" onchange="previsualizarImagen(event)"/>
+          <div class="icono">🖼️</div>
+          <p>Haz clic aquí para elegir una foto desde tu computador</p>
+          <p style="font-size:0.78rem; color:#C68642; margin-top:4px;">JPG, PNG o WEBP</p>
+        </div>
+        <!-- La imagen que subiste aparece aquí antes de guardar -->
+        <img id="previsualizacion" alt="Vista previa"/>
+      </div>
+
+      <div class="mensaje-exito" id="mensajeExito">
+        ✅ ¡Terreno agregado correctamente! Ya aparece en la página principal.
+      </div>
+
+      <button class="btn-agregar" onclick="agregarTerreno()">Guardar terreno</button>
+    </div>
+
+    <!-- ══════════ LISTA DE TERRENOS GUARDADOS ══════════ -->
+    <div class="seccion-lista">
+      <h3>📋 Terrenos guardados</h3>
+      <div class="lista-terrenos" id="listaTerrenos">
+        <!-- Los terrenos se cargan aquí automáticamente -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════ VENTANITA DE EDICIÓN ══════════ -->
+  <!-- Esta ventanita aparece cuando haces clic en "Editar" -->
+  <div class="modal-fondo" id="modalEdicion">
+    <div class="modal-caja">
+      <h3>✏️ Editar terreno</h3>
+
+      <div class="fila-campos">
+        <div class="campo">
+          <label>Nombre del terreno</label>
+          <input type="text" id="editNombre" placeholder="Ej: Parcela El Roble"/>
+        </div>
+        <div class="campo">
+          <label>Precio (en pesos chilenos)</label>
+          <input type="text" id="editPrecio" placeholder="Ej: 45.000.000"/>
+        </div>
+      </div>
+
+      <div class="fila-campos">
+        <div class="campo">
+          <label>Superficie</label>
+          <input type="text" id="editSuperficie" placeholder="Ej: 5.000 m²"/>
+        </div>
+        <div class="campo">
+          <label>Ubicación</label>
+          <input type="text" id="editUbicacion" placeholder="Ej: Región del Maule"/>
+        </div>
+      </div>
+
+      <div class="campo completo">
+        <label>Descripción</label>
+        <textarea id="editDescripcion" placeholder="Describe el terreno..."></textarea>
+      </div>
+
+      <div class="campo completo">
+        <label>Estado</label>
+        <select id="editEstado">
+          <option value="disponible">Disponible</option>
+          <option value="vendido">Vendido</option>
+        </select>
+      </div>
+
+      <div class="campo completo">
+        <label>Nueva foto (opcional — si no subes una, se mantiene la anterior)</label>
+        <div class="zona-imagen">
+          <input type="file" id="editInputImagen" accept="image/*" onchange="previsualizarEdicion(event)"/>
+          <div class="icono">🖼️</div>
+          <p>Haz clic para cambiar la foto</p>
+        </div>
+        <img id="editPrevisualizacion" alt="Vista previa" style="display:none; margin-top:1rem; width:100%; max-height:180px; object-fit:cover; border-radius:8px;"/>
+      </div>
+
+      <div class="modal-botones">
+        <button class="btn-guardar-edicion" onclick="guardarEdicion()">💾 Guardar cambios</button>
+        <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =====================================================
+    // VERIFICAR QUE EL ADMIN ESTÉ LOGUEADO
+    // Si alguien intenta entrar directo a admin.html
+    // sin haber hecho login, lo mandamos de vuelta.
+    // =====================================================
+    const adminLogueado = localStorage.getItem("adminLogueado");
+    if (adminLogueado !== "si") {
+      window.location.href = "login.html";
+    }
+
+    // Mostramos el correo del admin en la barra superior
+    document.getElementById("correoAdmin").textContent =
+      localStorage.getItem("adminCorreo") || "";
+
+    // =====================================================
+    // MANEJO DE TERRENOS
+    // Los terrenos se guardan en localStorage del navegador.
+    // localStorage = memoria del navegador donde podemos
+    // guardar información que no desaparece al cerrar.
+    // JSON.parse convierte texto guardado en una lista usable.
+    // JSON.stringify convierte la lista en texto para guardarla.
+    // =====================================================
+    let terrenos = JSON.parse(localStorage.getItem("terrenos") || "[]");
+
+    // Imagen seleccionada (guardada temporalmente)
+    let imagenBase64 = "";
+
+    // Muestra una miniatura de la imagen elegida
+    function previsualizarImagen(evento) {
+      const archivo = evento.target.files[0];
+      if (!archivo) return;
+
+      // FileReader = herramienta que lee el archivo de imagen
+      const lector = new FileReader();
+      lector.onload = function(e) {
+        imagenBase64 = e.target.result; // Guardamos la imagen como texto especial (base64)
+        const prev = document.getElementById("previsualizacion");
+        prev.src = imagenBase64;
+        prev.style.display = "block";
+      };
+      lector.readAsDataURL(archivo);
+    }
+
+    // Guarda el nuevo terreno
+    function agregarTerreno() {
+      const nombre      = document.getElementById("nombreTerreno").value.trim();
+      const precio      = document.getElementById("precioTerreno").value.trim();
+      const superficie  = document.getElementById("superficieTerreno").value.trim();
+      const ubicacion   = document.getElementById("ubicacionTerreno").value.trim();
+      const descripcion = document.getElementById("descripcionTerreno").value.trim();
+      const estado      = document.getElementById("estadoTerreno").value;
+
+      // Verificamos que los campos obligatorios estén llenos
+      if (!nombre || !precio || !descripcion) {
+        alert("Por favor completa al menos el nombre, precio y descripción.");
+        return;
+      }
+
+      // Creamos el objeto del terreno con toda su información
+      const nuevoTerreno = {
+        id: Date.now(), // ID único basado en la hora actual
+        nombre,
+        precio,
+        superficie,
+        ubicacion,
+        descripcion,
+        estado,
+        imagen: imagenBase64 || "" // Si no subió imagen, queda vacío
+      };
+
+      // Lo agregamos a la lista y lo guardamos en el navegador
+      terrenos.push(nuevoTerreno);
+      localStorage.setItem("terrenos", JSON.stringify(terrenos));
+
+      // Mostramos el mensaje de éxito
+      document.getElementById("mensajeExito").style.display = "block";
+      setTimeout(() => {
+        document.getElementById("mensajeExito").style.display = "none";
+      }, 3000); // El mensaje desaparece después de 3 segundos
+
+      // Limpiamos el formulario para el próximo terreno
+      document.getElementById("nombreTerreno").value = "";
+      document.getElementById("precioTerreno").value = "";
+      document.getElementById("superficieTerreno").value = "";
+      document.getElementById("ubicacionTerreno").value = "";
+      document.getElementById("descripcionTerreno").value = "";
+      document.getElementById("estadoTerreno").value = "disponible";
+      document.getElementById("inputImagen").value = "";
+      document.getElementById("previsualizacion").style.display = "none";
+      imagenBase64 = "";
+
+      // Actualizamos la lista visible
+      mostrarLista();
+    }
+
+    // Elimina un terreno de la lista
+    function eliminarTerreno(id) {
+      if (!confirm("¿Estás seguro de que quieres eliminar este terreno?")) return;
+      terrenos = terrenos.filter(function(t) { return t.id !== id; });
+      localStorage.setItem("terrenos", JSON.stringify(terrenos));
+      mostrarLista();
+    }
+
+    // Dibuja la lista de terrenos guardados en pantalla
+    function mostrarLista() {
+      const contenedor = document.getElementById("listaTerrenos");
+
+      if (terrenos.length === 0) {
+        contenedor.innerHTML = '<div class="lista-vacia">Aún no has agregado ningún terreno. ¡Usa el formulario de arriba para comenzar!</div>';
+        return;
+      }
+
+      contenedor.innerHTML = terrenos.map(function(t) {
+        const imagenHTML = t.imagen
+          ? `<img src="${t.imagen}" alt="${t.nombre}"/>`
+          : `<div style="width:90px;height:70px;background:#F5ECD7;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;">🏞️</div>`;
+
+        const badgeEstado = t.estado === "disponible"
+          ? `<span class="item-estado estado-disponible">Disponible</span>`
+          : `<span class="item-estado estado-vendido">Vendido</span>`;
+
+        return `
+          <div class="item-terreno">
+            ${imagenHTML}
+            <div class="item-info">
+              <h4>${t.nombre}</h4>
+              <p>📐 ${t.superficie || "—"} &nbsp;|&nbsp; 📍 ${t.ubicacion || "—"}</p>
+              <p style="font-weight:700; color:#E07B39; margin-top:3px;">$${t.precio} CLP</p>
+            </div>
+            ${badgeEstado}
+            <button class="btn-editar" onclick="abrirEdicion(${t.id})">✏️ Editar</button>
+            <button class="btn-eliminar" onclick="eliminarTerreno(${t.id})">🗑️ Eliminar</button>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // =====================================================
+    // EDICIÓN DE TERRENOS
+    // =====================================================
+    let idEditando = null;      // Guardamos qué terreno estamos editando
+    let imagenEditada = "";     // Guardamos la nueva imagen si se cambia
+
+    // Abre la ventanita de edición con los datos actuales del terreno
+    function abrirEdicion(id) {
+      const terreno = terrenos.find(function(t) { return t.id === id; });
+      if (!terreno) return;
+
+      idEditando = id;
+
+      // Llenamos los campos con la información actual
+      document.getElementById("editNombre").value      = terreno.nombre;
+      document.getElementById("editPrecio").value      = terreno.precio;
+      document.getElementById("editSuperficie").value  = terreno.superficie || "";
+      document.getElementById("editUbicacion").value   = terreno.ubicacion || "";
+      document.getElementById("editDescripcion").value = terreno.descripcion;
+      document.getElementById("editEstado").value      = terreno.estado;
+
+      // Si ya tenía imagen, la mostramos
+      const prev = document.getElementById("editPrevisualizacion");
+      if (terreno.imagen) {
+        prev.src = terreno.imagen;
+        prev.style.display = "block";
+      } else {
+        prev.style.display = "none";
+      }
+
+      imagenEditada = ""; // Reseteamos la imagen nueva
+      document.getElementById("editInputImagen").value = "";
+
+      // Mostramos la ventanita
+      document.getElementById("modalEdicion").classList.add("activo");
+    }
+
+    // Muestra la nueva imagen elegida en la ventanita
+    function previsualizarEdicion(evento) {
+      const archivo = evento.target.files[0];
+      if (!archivo) return;
+      const lector = new FileReader();
+      lector.onload = function(e) {
+        imagenEditada = e.target.result;
+        const prev = document.getElementById("editPrevisualizacion");
+        prev.src = imagenEditada;
+        prev.style.display = "block";
+      };
+      lector.readAsDataURL(archivo);
+    }
+
+    // Guarda los cambios del terreno editado
+    function guardarEdicion() {
+      const nombre      = document.getElementById("editNombre").value.trim();
+      const precio      = document.getElementById("editPrecio").value.trim();
+      const superficie  = document.getElementById("editSuperficie").value.trim();
+      const ubicacion   = document.getElementById("editUbicacion").value.trim();
+      const descripcion = document.getElementById("editDescripcion").value.trim();
+      const estado      = document.getElementById("editEstado").value;
+
+      if (!nombre || !precio || !descripcion) {
+        alert("Por favor completa al menos el nombre, precio y descripción.");
+        return;
+      }
+
+      // Buscamos el terreno y actualizamos su información
+      terrenos = terrenos.map(function(t) {
+        if (t.id === idEditando) {
+          return {
+            ...t, // Mantenemos todo lo que ya tenía
+            nombre,
+            precio,
+            superficie,
+            ubicacion,
+            descripcion,
+            estado,
+            imagen: imagenEditada || t.imagen // Si subió imagen nueva la usamos, sino mantenemos la anterior
+          };
+        }
+        return t;
+      });
+
+      localStorage.setItem("terrenos", JSON.stringify(terrenos));
+      cerrarModal();
+      mostrarLista();
+    }
+
+    // Cierra la ventanita sin guardar nada
+    function cerrarModal() {
+      document.getElementById("modalEdicion").classList.remove("activo");
+      idEditando = null;
+    }
+
+    // Si el usuario hace clic fuera de la ventanita, también se cierra
+    document.getElementById("modalEdicion").addEventListener("click", function(e) {
+      if (e.target === this) cerrarModal();
+    });
+
+    // Cierra la sesión del admin y lo manda al login
+    function cerrarSesion() {
+      localStorage.removeItem("adminLogueado");
+      localStorage.removeItem("adminCorreo");
+      window.location.href = "login.html";
+    }
+
+    // Al cargar la página, mostramos los terrenos ya guardados
+    mostrarLista();
+  </script>
+
+</body>
+</html>

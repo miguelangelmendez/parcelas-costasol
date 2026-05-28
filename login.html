@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ingresar — Parcelas CostaSol</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/estilos.css"/>
+  <style>
+    /* Estilos específicos solo para esta página de login */
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background:
+        linear-gradient(rgba(30,10,0,0.7), rgba(30,10,0,0.7)),
+        url('https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=80') center/cover no-repeat;
+    }
+
+    .login-contenedor {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .login-caja {
+      background-color: #FDF6EC;
+      border-radius: 16px;
+      padding: 2.5rem 2.8rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+
+    .login-caja .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: #3E1F00;
+      margin-bottom: 0.3rem;
+    }
+
+    .login-caja .subtitulo-login {
+      font-size: 0.9rem;
+      color: #7B3F00;
+      margin-bottom: 2rem;
+    }
+
+    .login-caja h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: #3E1F00;
+      margin-bottom: 1.8rem;
+    }
+
+    /* Grupo de campo: la etiqueta + el campo de texto juntos */
+    .campo-grupo {
+      text-align: left;
+      margin-bottom: 1.2rem;
+    }
+
+    .campo-grupo label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #5C3D1E;
+      margin-bottom: 0.4rem;
+    }
+
+    .campo-grupo input {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 1.5px solid #D4B896;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: 'Lato', sans-serif;
+      background-color: #fff;
+      color: #2C1A00;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    .campo-grupo input:focus {
+      border-color: #E07B39; /* Al hacer clic en el campo, el borde se pone naranja */
+    }
+
+    /* Botón de ingresar */
+    .btn-ingresar {
+      width: 100%;
+      padding: 0.8rem;
+      background-color: #3E1F00;
+      color: #FDF6EC;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: 'Lato', sans-serif;
+      cursor: pointer; /* El cursor se convierte en manito al pasar */
+      transition: background-color 0.2s;
+      margin-top: 0.5rem;
+    }
+
+    .btn-ingresar:hover {
+      background-color: #E07B39;
+    }
+
+    /* Mensaje de error que aparece si la contraseña es incorrecta */
+    .mensaje-error {
+      display: none; /* Empieza oculto, aparece solo si hay error */
+      background-color: #fde8e8;
+      color: #c0392b;
+      border: 1px solid #f5c6c6;
+      border-radius: 8px;
+      padding: 0.7rem 1rem;
+      font-size: 0.88rem;
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+
+    .volver-inicio {
+      display: block;
+      margin-top: 1.3rem;
+      font-size: 0.88rem;
+      color: #7B3F00;
+      text-decoration: none;
+    }
+
+    .volver-inicio:hover {
+      color: #E07B39;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar igual que en index -->
+  <nav class="navbar">
+    <div class="navbar-logo">🌄 Parcelas CostaSol</div>
+    <div class="navbar-links">
+      <a href="index.html">Inicio</a>
+      <a href="index.html#terrenos">Terrenos</a>
+      <a href="index.html#contacto">Contacto</a>
+    </div>
+  </nav>
+
+  <!-- Caja de login centrada en la pantalla -->
+  <div class="login-contenedor">
+    <div class="login-caja">
+
+      <div class="logo">🌄 Parcelas CostaSol</div>
+      <div class="subtitulo-login">Acceso exclusivo para administradores</div>
+
+      <h2>Ingresar</h2>
+
+      <!-- Mensaje de error (aparece solo si los datos son incorrectos) -->
+      <div class="mensaje-error" id="mensajeError">
+        ❌ Correo o contraseña incorrectos. Intenta de nuevo.
+      </div>
+
+      <!-- Formulario de login -->
+      <div class="campo-grupo">
+        <label for="correo">Correo electrónico</label>
+        <input type="email" id="correo" placeholder="tucorreo@ejemplo.com" />
+      </div>
+
+      <div class="campo-grupo">
+        <label for="contrasena">Contraseña</label>
+        <input type="password" id="contrasena" placeholder="••••••••" />
+        <!-- type="password" hace que aparezcan puntos en vez de letras -->
+      </div>
+
+      <button class="btn-ingresar" onclick="intentarLogin()">Ingresar</button>
+
+      <a href="index.html" class="volver-inicio">← Volver a la página principal</a>
+
+    </div>
+  </div>
+
+  <script>
+    // =====================================================
+    // LÓGICA DEL LOGIN
+    // Esta parte comprueba si el correo y contraseña
+    // que escribió el usuario son correctos.
+    // =====================================================
+
+    // Lista de administradores permitidos
+    // Cada admin tiene un correo y una contraseña
+    const administradores = [
+      {
+        correo: "miguelangel.mendez8888@gmail.com",
+        contrasena: "reyes1987"
+      }
+      // Aquí agregaremos el segundo admin cuando estés listo
+    ];
+
+    function intentarLogin() {
+      // Leemos lo que escribió el usuario en los campos
+      const correoIngresado = document.getElementById("correo").value.trim();
+      const contrasenaIngresada = document.getElementById("contrasena").value;
+      const mensajeError = document.getElementById("mensajeError");
+
+      // Buscamos si hay algún admin con ese correo Y esa contraseña
+      const adminEncontrado = administradores.find(function(admin) {
+        return admin.correo === correoIngresado && admin.contrasena === contrasenaIngresada;
+      });
+
+      if (adminEncontrado) {
+        // ✅ Los datos son correctos
+        // Guardamos en el navegador que el admin está logueado
+        // localStorage es como una memoria temporal del navegador
+        localStorage.setItem("adminLogueado", "si");
+        localStorage.setItem("adminCorreo", correoIngresado);
+
+        // Redirigimos al panel de administrador
+        window.location.href = "admin.html";
+
+      } else {
+        // ❌ Los datos son incorrectos — mostramos el mensaje de error
+        mensajeError.style.display = "block";
+      }
+    }
+
+    // Permite presionar Enter para iniciar sesión, sin necesidad de hacer clic
+    document.addEventListener("keydown", function(evento) {
+      if (evento.key === "Enter") {
+        intentarLogin();
+      }
+    });
+  </script>
+
+</body>
+</html>
